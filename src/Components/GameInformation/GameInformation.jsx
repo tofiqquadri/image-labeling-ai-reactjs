@@ -4,7 +4,7 @@ const GameInformation = ({ secondsLeft }) => {
     return (
         <section
             id=""
-            className="game-section mt-20 bg-gray-100 py-10 md:py-16">
+            className="game-section bg-gray-100 py-10 md:py-16">
             <div className="max-w-7xl mx-auto px-5 md:px-0 text-center">
                 <h2 className="font-Graphik font-bold text-themeLightBlue text-2xl md:text-4xl w-3/4 md:w-full mx-auto">
                     Let's start with{' '}
@@ -24,7 +24,7 @@ const GameInformation = ({ secondsLeft }) => {
                 </p>
 
                 <p className="text-lg md:text-2xl text-themeBlue font-bold leading-5 mt-9">
-                    You'll be redirected in 5 seconds!
+                    You'll be redirected in {secondsLeft} seconds!
                 </p>
                 <img
                     src="images/choosing.gif"

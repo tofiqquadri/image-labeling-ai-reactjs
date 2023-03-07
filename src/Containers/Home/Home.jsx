@@ -1,4 +1,3 @@
-import Hero from 'Components/HeroSection/HeroSection';
 import GameInformation from 'Components/GameInformation/GameInformation';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -22,7 +21,6 @@ const Home = () => {
 
     return (
         <>
-            <Hero />
             <GameInformation secondsLeft={countDown} />
         </>
     );

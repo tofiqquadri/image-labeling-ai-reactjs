@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 const Header = () => {
     return (
-        <nav className="mx-auto bg-themeBlue py-4">
+        <nav className="bg-themeBlue py-4">
             <div className="max-w-7xl flex items-center justify-between px-5 md:px-0 mx-auto">
                 <div>
                     <img src="images/RapidataLogo.svg" width="100px" alt="" />

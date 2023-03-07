@@ -1,8 +1,10 @@
+import SolutionSection from 'Components/SolutionSection/SolutionSection';
+
 const ModelTrainer = () => {
     return (
-        <div>
-            <h1>Model Trainer</h1>
-        </div>
+        <>
+            <SolutionSection />
+        </>
     );
 };
 

@@ -1,6 +1,10 @@
-const GameInformation = () => {
+import { NavLink } from 'react-router-dom';
+
+const GameInformation = ({ secondsLeft }) => {
     return (
-        <section id="" className="game-section mt-20 bg-gray-100 py-10 md:py-16">
+        <section
+            id=""
+            className="game-section mt-20 bg-gray-100 py-10 md:py-16">
             <div className="max-w-7xl mx-auto px-5 md:px-0 text-center">
                 <h2 className="font-Graphik font-bold text-themeLightBlue text-2xl md:text-4xl w-3/4 md:w-full mx-auto">
                     Let's start with{' '}
@@ -33,9 +37,11 @@ const GameInformation = () => {
                     Clicking will never redirect you!
                 </p>
 
-                <span className="bg-themeLightBlue rounded-[5px] text-white font-Graphik font-medium px-10 py-3">
-                    Let's Go
-                </span>
+                <NavLink
+                    to="/model-trainer"
+                    className="bg-themeLightBlue rounded-[5px] text-white font-Graphik font-medium px-10 py-3">
+                    Let's Go ({secondsLeft})
+                </NavLink>
             </div>
         </section>
     );

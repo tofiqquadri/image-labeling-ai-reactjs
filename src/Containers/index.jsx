@@ -11,7 +11,7 @@ const pagesData = [
         title: 'home'
     },
     {
-        path: 'model-tainer',
+        path: 'model-trainer',
         element: <ModelTrainer />,
         title: 'ModelTrainer'
     },

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getTrainingDataImages } from 'Shared/Services/API/Api';
 import { RectangleSelector } from 'react-image-annotation/lib/selectors';
 import Annotation from 'react-image-annotation';
 
 const SolutionSection = () => {
+    const navigate = useNavigate();
     const [trainingImage, setTrainingImage] = useState(null);
     const [annotations, setAnnotations] = useState([]);
     const [annotation, setAnnotation] = useState({});
@@ -29,8 +31,6 @@ const SolutionSection = () => {
 
     const onSubmit = (annotation) => {
         const { geometry, data } = annotation;
-        console.log(geometry, data);
-
         setAnnotation({});
         setAnnotations([
             ...annotations,
@@ -44,23 +44,55 @@ const SolutionSection = () => {
         ]);
     };
 
-    const renderContent = ({ annotation }) => {
+    const onCompleteLabelingHandler = () => {
+        if (trainingImage) {
+            let requestPayload = { ...trainingImage, carLocations: [] };
+            for (
+                let annotationIndex = 0;
+                annotationIndex < annotations.length;
+                annotationIndex++
+            ) {
+                const { geometry } = annotations[annotationIndex];
+                const top = parseFloat(geometry.y).toFixed(4);
+                const left = parseFloat(geometry.x).toFixed(4);
+                const bottom = parseFloat(geometry.y + geometry.height).toFixed(
+                    4
+                );
+                const right = parseFloat(geometry.x + geometry.width).toFixed(
+                    4
+                );
+                requestPayload = {
+                    ...requestPayload,
+                    carLocations: [
+                        ...requestPayload.carLocations,
+                        {
+                            top,
+                            left,
+                            bottom,
+                            right
+                        }
+                    ]
+                };
+            }
+
+            console.log('HTTP Request Payload', requestPayload);
+            navigate('/confirmation');
+        }
+    };
+
+    const CustomContent = ({ annotation }) => {
         const { geometry } = annotation;
         return (
-            <div
-                className="flex flex-col text-center bg-white text-black px-2 py-2 sm:px-0 sm:py-0 text-sm absolute"
+            <button
                 key={annotation.data.id}
                 style={{
                     left: `${geometry.x}%`,
                     top: `${geometry.y + geometry.height}%`
-                }}>
-                <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={() => onDelete(annotation)}>
-                    DELETE
-                </button>
-                {annotation.data && annotation.data.text}
-            </div>
+                }}
+                className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded absolute"
+                onClick={() => onDelete(annotation)}>
+                DELETE
+            </button>
         );
     };
 
@@ -104,7 +136,7 @@ const SolutionSection = () => {
                                 showEditor={false}
                                 onChange={onChange}
                                 onSubmit={onSubmit}
-                                renderContent={renderContent}
+                                renderContent={CustomContent}
                                 renderEditor={(props) => (
                                     <CustomEditor {...props} />
                                 )}
@@ -115,11 +147,15 @@ const SolutionSection = () => {
                 )}
             </div>
 
-            <div className="text-center">
-                <button className="bg-themeLightBlue rounded-[5px] text-white font-Graphik font-medium px-10 py-3 my-3">
-                    Done
-                </button>
-            </div>
+            {annotations && annotations.length > 0 && (
+                <div className="text-center">
+                    <button
+                        className="bg-themeLightBlue rounded-[5px] text-white font-Graphik font-medium px-10 py-3 my-3"
+                        onClick={() => onCompleteLabelingHandler()}>
+                        Done
+                    </button>
+                </div>
+            )}
         </section>
     );
 };

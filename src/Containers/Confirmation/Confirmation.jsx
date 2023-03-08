@@ -1,8 +1,10 @@
+import SolutionEndConfirmation from 'Components/SolutionEndConfirmation/SolutionEndConfirmation';
+
 const Confirmation = () => {
     return (
-        <div>
-            <h1>Thank You</h1>
-        </div>
+        <>
+            <SolutionEndConfirmation />
+        </>
     );
 };
 

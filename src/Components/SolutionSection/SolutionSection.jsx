@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTrainingDataImages } from 'Shared/Services/API/Api';
 import { RectangleSelector } from 'react-image-annotation/lib/selectors';
+import {
+    CustomContent,
+    CustomSelector,
+    CustomEditor
+} from 'Shared/Library/ImageAnnotation/ImageAnnotation';
 import Annotation from 'react-image-annotation';
 
 const SolutionSection = () => {
@@ -80,39 +85,6 @@ const SolutionSection = () => {
         }
     };
 
-    const CustomContent = ({ annotation }) => {
-        const { geometry } = annotation;
-        return (
-            <button
-                key={annotation.data.id}
-                style={{
-                    left: `${geometry.x}%`,
-                    top: `${geometry.y + geometry.height}%`
-                }}
-                className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded absolute"
-                onClick={() => onDelete(annotation)}>
-                DELETE
-            </button>
-        );
-    };
-
-    const CustomEditor = ({ annotation }) => {
-        return (
-            <button
-                type="button"
-                className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded mt-2"
-                style={{
-                    position: 'absolute',
-                    left: annotation.geometry.x + '%',
-                    top:
-                        annotation.geometry.y + annotation.geometry.height + '%'
-                }}
-                onClick={() => onSubmit(annotation)}>
-                SUBMIT
-            </button>
-        );
-    };
-
     return (
         <section id="choose" className="choose-section mt-20">
             <div className="max-w-7xl mx-auto px-5 md:px-0">
@@ -136,9 +108,18 @@ const SolutionSection = () => {
                                 showEditor={false}
                                 onChange={onChange}
                                 onSubmit={onSubmit}
-                                renderContent={CustomContent}
+                                renderSelector={CustomSelector}
+                                renderContent={(props) => (
+                                    <CustomContent
+                                        {...props}
+                                        onDelete={onDelete}
+                                    />
+                                )}
                                 renderEditor={(props) => (
-                                    <CustomEditor {...props} />
+                                    <CustomEditor
+                                        {...props}
+                                        onSubmit={onSubmit}
+                                    />
                                 )}
                                 allowTouch
                             />

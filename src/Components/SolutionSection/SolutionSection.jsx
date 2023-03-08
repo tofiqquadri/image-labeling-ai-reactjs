@@ -11,13 +11,18 @@ import Annotation from 'react-image-annotation';
 
 const SolutionSection = () => {
     const navigate = useNavigate();
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [trainingImages, setTrainingImages] = useState(null);
     const [trainingImage, setTrainingImage] = useState(null);
     const [annotations, setAnnotations] = useState([]);
     const [annotation, setAnnotation] = useState({});
 
     useEffect(() => {
         getTrainingDataImages().then((data) => {
-            setTrainingImage(data);
+            setTrainingImages(data);
+            if (data && data.length > 0) {
+                setTrainingImage({ ...data[currentImageIndex] });
+            }
         });
     }, []);
 
@@ -49,35 +54,72 @@ const SolutionSection = () => {
         ]);
     };
 
-    const onCompleteLabelingHandler = () => {
-        if (trainingImage) {
-            let requestPayload = { ...trainingImage, carLocations: [] };
+    const onNextModelHandler = () => {
+        let updatedTrainingImages = [...trainingImages];
+        updatedTrainingImages[currentImageIndex] = {
+            ...trainingImage,
+            annotations
+        };
+
+        setTrainingImages(updatedTrainingImages);
+        setAnnotations([]);
+        setAnnotation({});
+        const nextTrainingImageIndex = currentImageIndex + 1;
+
+        if (nextTrainingImageIndex < trainingImages.length) {
+            setCurrentImageIndex(nextTrainingImageIndex);
+            setTrainingImage(trainingImages[nextTrainingImageIndex]);
+        } else {
+            onCompleteLabelingHandler(updatedTrainingImages);
+        }
+    };
+
+    const onCompleteLabelingHandler = (trainingImages) => {
+        if (trainingImages && trainingImages.length > 0) {
+            let requestPayload = [];
             for (
-                let annotationIndex = 0;
-                annotationIndex < annotations.length;
-                annotationIndex++
+                let trainingImagesIndex = 0;
+                trainingImagesIndex < trainingImages.length;
+                trainingImagesIndex++
             ) {
-                const { geometry } = annotations[annotationIndex];
-                const top = parseFloat(geometry.y).toFixed(4);
-                const left = parseFloat(geometry.x).toFixed(4);
-                const bottom = parseFloat(geometry.y + geometry.height).toFixed(
-                    4
-                );
-                const right = parseFloat(geometry.x + geometry.width).toFixed(
-                    4
-                );
-                requestPayload = {
-                    ...requestPayload,
-                    carLocations: [
-                        ...requestPayload.carLocations,
-                        {
-                            top,
-                            left,
-                            bottom,
-                            right
-                        }
-                    ]
+                const trainingImage = trainingImages[trainingImagesIndex];
+
+                let trainingRequestPayload = {
+                    ...trainingImage,
+                    carLocations: []
                 };
+                const { annotations } = trainingImage;
+
+                for (
+                    let annotationIndex = 0;
+                    annotationIndex < annotations.length;
+                    annotationIndex++
+                ) {
+                    const { geometry } = annotations[annotationIndex];
+                    const top = parseFloat(geometry.y).toFixed(4);
+                    const left = parseFloat(geometry.x).toFixed(4);
+                    const bottom = parseFloat(
+                        geometry.y + geometry.height
+                    ).toFixed(4);
+                    const right = parseFloat(
+                        geometry.x + geometry.width
+                    ).toFixed(4);
+
+                    trainingRequestPayload = {
+                        ...trainingRequestPayload,
+                        carLocations: [
+                            ...trainingRequestPayload.carLocations,
+                            {
+                                top,
+                                left,
+                                bottom,
+                                right
+                            }
+                        ]
+                    };
+                    delete trainingRequestPayload['annotations'];
+                }
+                requestPayload.push(trainingRequestPayload);
             }
 
             console.log('HTTP Request Payload', requestPayload);
@@ -132,7 +174,7 @@ const SolutionSection = () => {
                 <div className="text-center">
                     <button
                         className="bg-themeLightBlue rounded-[5px] text-white font-Graphik font-medium px-10 py-3 my-3"
-                        onClick={() => onCompleteLabelingHandler()}>
+                        onClick={() => onNextModelHandler()}>
                         Done
                     </button>
                 </div>
